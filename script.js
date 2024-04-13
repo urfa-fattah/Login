@@ -6,7 +6,8 @@ function validatePassword() {
       "amici": "https://amiciforever.netlify.app/",
       "rifat":"https://rifatuzzaman.netlify.app/",
       "happy birthday":"https://happy-birthday-rifat-7lkl.vercel.app/#amici",
-      // Add more passwords and URLs as needed
+      "eid_mubarak":"https://eid-mubarak-phi.vercel.app/",
+      "prettythings":"https://prettymoons.netlify.app/"  // Add more passwords and URLs as needed
     };
 
     // Check if entered password matches predefined passwords

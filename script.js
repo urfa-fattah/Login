@@ -92,3 +92,16 @@ window.onload = function() {
         document.getElementById('remember').checked = true;
     }
 };
+function togglePasswordVisibility() {
+    var passwordField = document.getElementById("pas");
+    var toggleIcon = document.getElementById("togglePassword").children[0];
+    if (passwordField.type === "password") {
+        passwordField.type = "text";
+        toggleIcon.classList.remove("fa-eye");
+        toggleIcon.classList.add("fa-eye-slash");
+    } else {
+        passwordField.type = "password";
+        toggleIcon.classList.remove("fa-eye-slash");
+        toggleIcon.classList.add("fa-eye");
+    }
+}

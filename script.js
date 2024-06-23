@@ -7,13 +7,13 @@ var usersData = {
     },
     "orpa": {
         "password": "orpa456",
-        "securityQuestion": "What is your pet's name?",
-        "securityAnswer": "fluffy"
+        "securityQuestion": "How created your website?",
+        "securityAnswer": "rifat"
     },
     "amici": {
-        "password": "amici789",
-        "securityQuestion": "What is your mother's maiden name?",
-        "securityAnswer": "smith"
+        "password": "amici",
+        "securityQuestion": "What is the meaning of amici?",
+        "securityAnswer": "friend"
     },
     "rifat": {
         "password":"motu", 
@@ -25,10 +25,10 @@ var usersData = {
 
 // Predefined passwords with URLs
 var passwords = {
-    "me123": "https://example.com/me123",
-    "orpa456": "https://example.com/orpa456",
-    "amici789": "https://example.com/amici789",
-    "motu":"https://rifatuzzaman.netlify.app/"
+    "me123": "https://urfahasanfattah-urfa-fattahs-projects.vercel.app/",
+    "orpa456": "https://orpa-github-io.vercel.app/",
+    "amici789": "https://amici-six.vercel.app/",
+    "motu":"https://happy-birthday-rifat.vercel.app/"
     // Add more passwords and URLs as needed
 };
 

@@ -3,62 +3,566 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login Page</title>
+    <title>Super Advanced React Login Page</title>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
-    <link rel="stylesheet" href="styles.css">
+
     <style>
-        /* Additional CSS styles specific to this solution */
-        .input-group-text.highlight {
+        /* General Styles */
+        body {
+            background: linear-gradient(135deg, #1f4068 0%, #162447 100%);
+            /* Background animation effect */
+            background-size: 400% 400%;
+            animation: gradient-shift 15s ease infinite;
+        }
+        @keyframes gradient-shift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .min-vh-100 {
+            min-height: 100vh;
+        }
+        .login-box {
+            background-color: rgba(255, 255, 255, 0.1);
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            max-width: 400px;
+            width: 100%;
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            /* Entry animation */
+            animation: fadeIn 1s ease-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .login-icon {
+            font-size: 4rem;
+            color: #fff;
+            margin-bottom: 20px;
+            text-shadow: 0 0 15px #ffc107;
+            text-align: center;
+        }
+        .form-control, .input-group-text {
+            background-color: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: #fff;
+        }
+        .form-control:focus {
+            background-color: rgba(255, 255, 255, 0.2);
+            box-shadow: 0 0 0 0.2rem rgba(255, 193, 7, 0.25);
+            color: #fff;
+        }
+        .form-control::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+        .input-group-text {
+            border-radius: .25rem 0 0 .25rem;
+            color: #ffc107; /* Icon color */
+        }
+        .btn-block {
             background-color: #ffc107;
             color: #212529;
+            font-weight: bold;
+            border: none;
+            transition: all 0.3s ease;
+        }
+        .btn-block:hover {
+            background-color: #e0a800;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.3);
+        }
+        .text-white {
+            color: #fff !important;
+        }
+        a.text-white:hover {
+            color: #ffc107 !important;
+            text-decoration: none;
+        }
+
+        /* Input Focus/Highlighting */
+        .input-group.input-focused .input-group-text {
+            background-color: #ffc107;
+            color: #212529;
+            box-shadow: 0 0 0 0.2rem rgba(255, 193, 7, 0.25);
+        }
+        .invalid-feedback {
+            display: block !important;
+            color: #dc3545;
+            font-weight: bold;
+        }
+
+        /* Password Strength Meter */
+        .password-strength-meter {
+            height: 5px;
+            margin-top: 5px;
+            border-radius: 5px;
+            background-color: rgba(255, 255, 255, 0.2);
+            overflow: hidden;
+        }
+        .strength-bar {
+            height: 100%;
+            width: 0%;
+            transition: width 0.3s ease, background-color 0.3s ease;
+        }
+        .strength-bar.weak { background-color: #dc3545; }
+        .strength-bar.medium { background-color: #ffc107; }
+        .strength-bar.strong { background-color: #28a745; }
+
+        /* Tooltip (Info Icon) */
+        .info-container {
+            position: relative;
+            display: inline-block;
+            margin-left: 10px;
+        }
+        .info-icon {
+            color: #adb5bd;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+        .info-icon:hover {
+            color: #ffc107;
+        }
+        .info-tooltip {
+            visibility: hidden;
+            background-color: #343a40;
+            color: #fff;
+            text-align: left;
+            border-radius: 6px;
+            padding: 10px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%; /* Position above the icon */
+            left: 50%;
+            margin-left: -150px; /* Center the tooltip */
+            width: 300px;
+            opacity: 0;
+            transition: opacity 0.3s, visibility 0.3s;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+        }
+        .info-container:hover .info-tooltip {
+            visibility: visible;
+            opacity: 1;
+        }
+        .info-tooltip::after {
+            content: "";
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            margin-left: -5px;
+            border-width: 5px;
+            border-style: solid;
+            border-color: #343a40 transparent transparent transparent;
+        }
+
+        /* Modal Styles (kept from previous version) */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+            z-index: 1050;
+        }
+        .modal-overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
+        .modal-content-custom {
+            background-color: #212529;
+            padding: 30px;
+            border-radius: 10px;
+            position: relative;
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+            max-width: 400px;
+            width: 90%;
+            color: white;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+        }
+        .modal-overlay.show .modal-content-custom {
+            transform: scale(1);
+        }
+        .modal-content-custom h2 {
+            color: #ffc107;
+            margin-bottom: 20px;
+        }
+        .modal-content-custom .close {
+            position: absolute;
+            top: 10px;
+            right: 20px;
+            color: #fff;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+        .modal-content-custom .close:hover {
+            color: #ffc107;
         }
     </style>
 </head>
 <body>
-    <div class="container d-flex justify-content-center align-items-center min-vh-100">
-        <div class="login-box">
-            <div class="login-icon mx-auto">
-                <i class="fas fa-user"></i>
-            </div>
-            <form onsubmit="return validatePassword()">
-                <div class="input-group mb-3">
-                    <div class="input-group-prepend">
-                        <span class="input-group-text" id="basic-addon1"><i class="fas fa-user"></i></span>
-                    </div>
-                    <input type="text" class="form-control" placeholder="Username" aria-label="Username" aria-describedby="basic-addon1" id="usa" required>
-                </div>
-                <div class="input-group mb-3">
-                    <div class="input-group-prepend">
-                        <span class="input-group-text" id="basic-addon2"><i class="fas fa-lock"></i></span>
-                    </div>
-                    <input type="password" class="form-control" placeholder="Password" aria-label="Password" aria-describedby="basic-addon2" id="pas" required>
-                    <div class="input-group-append">
-                        <span class="input-group-text" id="togglePassword" onclick="togglePasswordVisibility()"><i class="fas fa-eye"></i></span>
-                    </div>
-                </div>
-                <div class="form-group form-check d-flex justify-content-between">
-                    <input type="checkbox" class="form-check-input" id="remember">
-                    <label class="form-check-label text-white" for="remember">Remember me</label>
-                    <a href="#" class="text-white" onclick="showForgotPasswordModal()">Forgot Password?</a>
-                </div>
-                <button type="submit" class="btn btn-block">Login</button>
-            </form>
+    <div id="root">
         </div>
-    </div>
 
-    <!-- Forgot Password Modal -->
-    <div id="forgotPasswordModal" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="closeForgotPasswordModal()">&times;</span>
-            <h2>Forgot Password</h2>
-            <p id="securityQuestion"></p>
-            <input type="hidden" id="forgotUsername">
-            <input type="text" id="securityAnswer" class="form-control mb-3" placeholder="Answer">
-            <button class="btn btn-primary" onclick="forgotPassword()">Submit</button>
-        </div>
-    </div>
+    <script type="text/babel">
+        const { useState, useEffect, useCallback } = React;
+        const root = ReactDOM.createRoot(document.getElementById('root'));
 
-    <script src="script.js"></script>
+        // --- Mock Data (as requested - Frontend only) ---
+        const usersData = {
+            "me": { "password": "me123", "securityQuestion": "What is your favorite color?", "securityAnswer": "blue" },
+            "orpa": { "password": "orpa456", "securityQuestion": "How created your website?", "securityAnswer": "rifat" },
+            "amici": { "password": "amici", "securityQuestion": "What is the meaning of amici?", "securityAnswer": "friend" },
+            "rifat": { "password": "motu", "securityQuestion": "What is your girlfriend's name?", "securityAnswer": "ankhi" }
+        };
+
+        const passwords = {
+            "me123": "https://uhf-green.vercel.app/",
+            "orpa456": "https://orpa-github-io.vercel.app/",
+            "amici": "https://amici-six.vercel.app/",
+            "motu": "https://happy-birthday-rifat.vercel.app/"
+        };
+        // ----------------------------------------------
+        
+        /**
+         * Utility function to calculate password strength (Zxcvbn light implementation)
+         */
+        const calculatePasswordStrength = (password) => {
+            if (password.length === 0) return { score: 0, class: '' };
+            let score = 0;
+            if (password.length >= 8) score += 1;
+            if (/[A-Z]/.test(password)) score += 1;
+            if (/[a-z]/.test(password)) score += 1;
+            if (/[0-9]/.test(password)) score += 1;
+            if (/[^A-Za-z0-9]/.test(password)) score += 1;
+            
+            let percentage = (score / 5) * 100;
+            
+            let strengthClass = 'weak';
+            if (percentage >= 80) strengthClass = 'strong';
+            else if (percentage >= 40) strengthClass = 'medium';
+            
+            return { score: percentage, class: strengthClass };
+        };
+
+
+        /**
+         * ForgotPasswordModal Component (kept similar for continuity)
+         */
+        function ForgotPasswordModal({ isVisible, onClose, setLoginUsername }) {
+            // ... (Modal logic remains the same as previous version) ...
+            const [step, setStep] = useState('username'); // 'username', 'question', 'success', 'error'
+            const [tempUsername, setTempUsername] = useState('');
+            const [securityQuestion, setSecurityQuestion] = useState('');
+            const [securityAnswer, setSecurityAnswer] = useState('');
+            const [modalError, setModalError] = useState('');
+
+            useEffect(() => {
+                if (!isVisible) {
+                    setTimeout(() => {
+                        setStep('username');
+                        setTempUsername('');
+                        setSecurityQuestion('');
+                        setSecurityAnswer('');
+                        setModalError('');
+                    }, 300);
+                }
+            }, [isVisible]);
+
+            const handleUsernameSubmit = (e) => {
+                e.preventDefault();
+                setModalError('');
+                const username = tempUsername.toLowerCase().trim();
+                const userData = usersData[username];
+
+                if (userData) {
+                    setSecurityQuestion(userData.securityQuestion);
+                    setStep('question');
+                    setLoginUsername(username);
+                } else {
+                    setModalError('Username not found.');
+                }
+            };
+
+            const handleAnswerSubmit = (e) => {
+                e.preventDefault();
+                setModalError('');
+                const username = tempUsername.toLowerCase().trim();
+                const answer = securityAnswer.toLowerCase().trim();
+                const userData = usersData[username];
+
+                if (userData && userData.securityAnswer.toLowerCase() === answer) {
+                    alert(`Your password is: ${userData.password}`);
+                    setStep('success');
+                    onClose();
+                } else {
+                    setModalError('Incorrect answer. Please try again.');
+                }
+            };
+
+            const modalClass = isVisible ? 'modal-overlay show' : 'modal-overlay';
+
+            return (
+                <div className={modalClass} onClick={onClose}>
+                    <div className="modal-content-custom" onClick={e => e.stopPropagation()}>
+                        <span className="close" onClick={onClose}>&times;</span>
+                        <h2>Forgot Password</h2>
+                        
+                        {step === 'username' && (
+                            <form onSubmit={handleUsernameSubmit}>
+                                <p>Enter your username to retrieve your security question.</p>
+                                <input
+                                    type="text"
+                                    className="form-control mb-3"
+                                    placeholder="Username"
+                                    value={tempUsername}
+                                    onChange={(e) => setTempUsername(e.target.value)}
+                                    required
+                                />
+                                <button type="submit" className="btn btn-primary btn-block">Next</button>
+                                {modalError && <div className="invalid-feedback mt-2">{modalError}</div>}
+                            </form>
+                        )}
+
+                        {step === 'question' && (
+                            <form onSubmit={handleAnswerSubmit}>
+                                <p>Security Question for **{tempUsername}**:</p>
+                                <p className="font-weight-bold text-info">{securityQuestion}</p>
+                                <input
+                                    type="text"
+                                    className="form-control mb-3"
+                                    placeholder="Your Answer"
+                                    value={securityAnswer}
+                                    onChange={(e) => setSecurityAnswer(e.target.value)}
+                                    required
+                                />
+                                <button type="submit" className="btn btn-warning btn-block">Verify</button>
+                                {modalError && <div className="invalid-feedback mt-2">{modalError}</div>}
+                            </form>
+                        )}
+                    </div>
+                </div>
+            );
+        }
+
+
+        /**
+         * LoginForm Component (Updated with Password Strength Meter and Info Icon)
+         */
+        function LoginForm({ showForgotPasswordModal, setForgotPasswordUsername }) {
+            const [username, setUsername] = useState('');
+            const [password, setPassword] = useState('');
+            const [rememberMe, setRememberMe] = useState(false);
+            const [passwordVisible, setPasswordVisible] = useState(false);
+            const [loginError, setLoginError] = useState('');
+            const [focusedInput, setFocusedInput] = useState(null);
+            const [usernameExists, setUsernameExists] = useState(false);
+            const [strength, setStrength] = useState({ score: 0, class: '' });
+
+            // Load credentials from localStorage on component mount
+            useEffect(() => {
+                const storedUsername = localStorage.getItem('username');
+                const storedPassword = localStorage.getItem('password');
+                
+                if (storedUsername && storedPassword) {
+                    setUsername(storedUsername);
+                    setPassword(storedPassword);
+                    setRememberMe(true);
+                    setUsernameExists(true);
+                }
+            }, []);
+
+            // Real-time username validation effect
+            useEffect(() => {
+                const lowerUsername = username.toLowerCase().trim();
+                setUsernameExists(!!usersData[lowerUsername] && lowerUsername.length > 0);
+            }, [username]);
+
+            // Real-time password strength check
+            useEffect(() => {
+                setStrength(calculatePasswordStrength(password));
+            }, [password]);
+
+
+            const handleLogin = (e) => {
+                e.preventDefault();
+                setLoginError('');
+
+                const lowerUsername = username.toLowerCase().trim();
+                const user = usersData[lowerUsername];
+
+                if (user && user.password === password) {
+                    if (rememberMe) {
+                        localStorage.setItem('username', lowerUsername);
+                        localStorage.setItem('password', password);
+                    } else {
+                        localStorage.removeItem('username');
+                        localStorage.removeItem('password');
+                    }
+                    window.location.href = passwords[user.password];
+                } else {
+                    setLoginError("Incorrect username or password. Please try again.");
+                }
+            };
+
+            const togglePasswordVisibility = () => {
+                setPasswordVisible(prev => !prev);
+            };
+
+            const usernameGroupClass = `input-group mb-3 ${focusedInput === 'username' ? 'input-focused' : ''}`;
+            const passwordGroupClass = `input-group mb-3 ${focusedInput === 'password' ? 'input-focused' : ''}`;
+
+            return (
+                <form onSubmit={handleLogin}>
+                    
+                    {/* Username Input */}
+                    <div className={usernameGroupClass}>
+                        <div className="input-group-prepend">
+                            <span className="input-group-text"><i className="fas fa-user"></i></span>
+                        </div>
+                        <input
+                            type="text"
+                            className="form-control"
+                            placeholder="Username"
+                            value={username}
+                            onChange={(e) => setUsername(e.target.value)}
+                            onFocus={() => setFocusedInput('username')}
+                            onBlur={() => setFocusedInput(null)}
+                            required
+                        />
+                        {usernameExists && focusedInput !== 'username' && (
+                             <div className="input-group-append">
+                                <span className="input-group-text bg-success text-white"><i className="fas fa-check-circle"></i></span>
+                            </div>
+                        )}
+                    </div>
+                    {loginError && <div className="invalid-feedback mb-2">{loginError}</div>}
+
+                    {/* Password Input */}
+                    <div className={passwordGroupClass}>
+                        <div className="input-group-prepend">
+                            <span className="input-group-text"><i className="fas fa-lock"></i></span>
+                        </div>
+                        <input
+                            type={passwordVisible ? "text" : "password"}
+                            className="form-control"
+                            placeholder="Password"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            onFocus={() => setFocusedInput('password')}
+                            onBlur={() => setFocusedInput(null)}
+                            required
+                        />
+                        <div className="input-group-append">
+                            <span className="input-group-text" id="togglePassword" onClick={togglePasswordVisibility}>
+                                <i className={passwordVisible ? "fas fa-eye-slash" : "fas fa-eye"}></i>
+                            </span>
+                        </div>
+                        {/* Info Tips Icon */}
+                        <div className="info-container">
+                            <i className="fas fa-info-circle info-icon"></i>
+                            <div className="info-tooltip">
+                                <h6>Login Tips:</h6>
+                                <p>1. Usernames are case-insensitive but passwords are not.</p>
+                                <p>2. Use **Remember Me** cautiously on public computers.</p>
+                                <p>3. Use the Forgot Password link to test the security question feature.</p>
+                            </div>
+                        </div>
+                    </div>
+                    {/* Password Strength Meter */}
+                    <div className="password-strength-meter mb-3">
+                        <div 
+                            className={`strength-bar ${strength.class}`} 
+                            style={{ width: `${strength.score}%` }}
+                        ></div>
+                    </div>
+
+                    {/* Remember Me and Forgot Password */}
+                    <div className="form-group form-check d-flex justify-content-between align-items-center">
+                        <div>
+                            <input 
+                                type="checkbox" 
+                                className="form-check-input" 
+                                id="remember"
+                                checked={rememberMe}
+                                onChange={(e) => setRememberMe(e.target.checked)}
+                            />
+                            <label className="form-check-label text-white" htmlFor="remember">Remember me</label>
+                        </div>
+                        <a 
+                            href="#" 
+                            className="text-white" 
+                            onClick={(e) => {
+                                e.preventDefault();
+                                showForgotPasswordModal();
+                                setForgotPasswordUsername(username);
+                            }}
+                        >
+                            Forgot Password?
+                        </a>
+                    </div>
+                    
+                    {/* Submit Button */}
+                    <button type="submit" className="btn btn-block">Login</button>
+                </form>
+            );
+        }
+
+        /**
+         * Main Application Component
+         */
+        function LoginApp() {
+            const [isModalVisible, setIsModalVisible] = useState(false);
+            const [forgotPasswordUsername, setForgotPasswordUsername] = useState('');
+
+            const showModal = () => setIsModalVisible(true);
+            const closeModal = () => setIsModalVisible(false);
+
+            return (
+                <div className="container d-flex justify-content-center align-items-center min-vh-100">
+                    <div className="login-box">
+                        <div className="login-icon mx-auto">
+                            <i className="fas fa-fingerprint"></i> {/* Updated icon for security */}
+                        </div>
+                        <h3 className="text-center text-white mb-4">Secure Access Portal</h3>
+                        
+                        <LoginForm 
+                            showForgotPasswordModal={showModal} 
+                            setForgotPasswordUsername={setForgotPasswordUsername}
+                        />
+
+                    </div>
+
+                    <ForgotPasswordModal 
+                        isVisible={isModalVisible} 
+                        onClose={closeModal} 
+                        setLoginUsername={setForgotPasswordUsername}
+                    />
+                </div>
+            );
+        }
+
+        // Render the main component
+        root.render(<LoginApp />);
+
+    </script>
 </body>
 </html>
